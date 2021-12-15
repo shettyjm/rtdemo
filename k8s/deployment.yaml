@@ -5,7 +5,7 @@ metadata:
   namespace: appdev-demo
  
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: appdev-cicd-demi-deploymnet
