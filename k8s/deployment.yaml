@@ -2,10 +2,10 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: appdev-cicd-demo-deploymnet
-  namespace: appdev-demo
+  
  
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: appdev-cicd-demi-deploymnet
