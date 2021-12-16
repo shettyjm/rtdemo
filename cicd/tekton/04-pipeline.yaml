@@ -1,0 +1,127 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+
+  name: build-and-deploy-appdev-demo
+  
+spec:
+  params:
+    - default: appdev-cicd-demo-deployment
+      description: name of the deployment to be patched
+      name: deployment-name
+      type: string
+    - description: url of the git repo for the code of deployment
+      name: git-url
+      type: string
+    - default: main
+      description: revision to be used from repo of the code for deployment
+      name: git-revision
+      type: string
+    - description: image to be build from the code
+      name: IMAGE
+      type: string
+    - default: ''
+      description: the context directory from where to build the application
+      name: contextDir
+      type: string
+    - default: k8s
+      description: the context directory from where to build the application
+      name: manifest_dir
+      type: string
+  tasks:
+    - name: build-start-slack
+      params:
+        - name: webhook-secret
+          value: webhook-secret
+        - name: git-revision
+          value: $(params.git-revision)
+        - name: state
+          value: START
+      taskRef:
+        kind: Task
+        name: send-to-webhook-slack
+      workspaces:
+        - name: slack-script
+          workspace: slack-script
+    - name: fetch-repository
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: subdirectory
+          value: ''
+        - name: deleteExisting
+          value: 'true'
+        - name: revision
+          value: $(params.git-revision)
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: build-java-app
+      runAfter:
+        - fetch-repository
+      taskRef:
+        kind: Task
+        name: mvn
+      workspaces:
+        - name: maven-repo
+          workspace: local-maven-repo
+        - name: source
+          workspace: shared-workspace
+    - name: build-image
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+      runAfter:
+        - build-java-app
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+    - name: apply-manifests
+      params:
+        - name: manifest_dir
+          value: $(params.manifest_dir)
+      runAfter:
+        - build-image
+      taskRef:
+        kind: Task
+        name: apply-manifests
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+    - name: update-deployment
+      params:
+        - name: deployment
+          value: $(params.deployment-name)
+        - name: IMAGE
+          value: $(params.IMAGE)
+      runAfter:
+        - apply-manifests
+      taskRef:
+        kind: Task
+        name: update-deployment
+    - name: build-end-slack
+      params:
+        - name: webhook-secret
+          value: webhook-secret
+        - name: git-revision
+          value: $(params.git-revision)
+        - name: state
+          value: END
+      runAfter:
+        - update-deployment
+      taskRef:
+        kind: Task
+        name: send-to-webhook-slack
+      workspaces:
+        - name: slack-script
+          workspace: slack-script
+  workspaces:
+    - name: shared-workspace
+    - name: local-maven-repo
+    - name: slack-script
