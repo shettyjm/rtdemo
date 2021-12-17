@@ -59,7 +59,7 @@ public class SalesforceRoute extends RouteBuilder {
                 .log("A Salesforce Account was undeleted: " +
                         "[ID:${body[Id]}, Name:${body[Name]}, AccountNumber:${body[AccountNumber]}, NumberOfEmployees:${body[NumberOfEmployees]}, BillingAddress: ${body[BillingAddress]}]")
                 .when(header("CamelSalesforceEventType").isEqualTo("deleted"))
-                .log("Demo 12981 A Salesforce Account was deleted: [ID:${body[Id]}]");
+                .log("Demo 12982 A Salesforce Account was deleted: [ID:${body[Id]}]");
 
                
                 // from("direct:netsuite-create-customer-route").id("direct-customer-master")
