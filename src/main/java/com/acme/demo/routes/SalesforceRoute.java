@@ -49,7 +49,7 @@ public class SalesforceRoute extends RouteBuilder {
                 .unmarshal().json()
                 .choice()
                 .when(header("CamelSalesforceEventType").isEqualTo("created"))
-                .log("DEMO 123456011 -New Salesforce Account was created: " +
+                .log("DEMO 123456012 -New Salesforce Account was created: " +
                         "[ID:${body[Id]}, Name:${body[Name]}, AccountNumber:${body[AccountNumber]}, NumberOfEmployees:${body[NumberOfEmployees]}, BillingAddress: ${body[BillingAddress]}]")
                          
                 .when(header("CamelSalesforceEventType").isEqualTo("updated"))
