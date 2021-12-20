@@ -14,8 +14,8 @@ import org.apache.camel.model.rest.RestBindingMode;
 @Component
 public class SalesforceRoute extends RouteBuilder {
 
-    @PropertyInject("{{nsroute.urll}}")
-    private String nsrouteUrl;
+//     @PropertyInject("{{nsroute.urll}}")
+//     private String nsrouteUrl;
 
     @Override
     public void configure() throws Exception {

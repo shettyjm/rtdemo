@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SlackRoute extends RouteBuilder {
 
-    @PropertyInject("{{application.connection.slack.webhook.url}}")
-    private String slackWebHook;
+    // @PropertyInject("{{application.connection.slack.webhook.url}}")
+    // private String slackWebHook;
 
   
 
@@ -30,7 +30,7 @@ public class SlackRoute extends RouteBuilder {
 
         from("direct:slack-notification").id("direct-slack-notification")
                 //.process(notificationProcessor)
-                .to("slack:#notification?iconEmoji=:camel&webhookUrl=" + slackWebHook).id("slack-producer")
+                .to("slack:#notification?iconEmoji=:camel&webhookUrl={{slackurl}}").id("slack-producer")
                 .log(LoggingLevel.INFO, "Test Post posted to slack-${body}");
     }
 }
