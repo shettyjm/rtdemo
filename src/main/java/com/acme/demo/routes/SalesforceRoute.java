@@ -27,7 +27,9 @@ public class SalesforceRoute extends RouteBuilder {
                 // asynchronous redelivery
                 .asyncDelayedRedelivery()
                 // log the exception details
-                .to("log:exceptionLogger");
+                //.to("log:exceptionLogger");
+                .to("direct:slack-notification");
+
 
         // call the embedded rest service from the RestController
         /*from("salesforce:{{salesforce.contact-topic}}")
@@ -51,6 +53,8 @@ public class SalesforceRoute extends RouteBuilder {
                 .when(header("CamelSalesforceEventType").isEqualTo("created"))
                 .log("DEMO 123456015 -New Salesforce Account was created: " +
                         "[ID:${body[Id]}, Name:${body[Name]}, AccountNumber:${body[AccountNumber]}, NumberOfEmployees:${body[NumberOfEmployees]}, BillingAddress: ${body[BillingAddress]}]")
+                        // notify the exception details
+                .to("direct:slack-notification")
                          
                 .when(header("CamelSalesforceEventType").isEqualTo("updated"))
                 .log("A Salesforce Account was updated: " +
@@ -59,7 +63,10 @@ public class SalesforceRoute extends RouteBuilder {
                 .log("A Salesforce Account was undeleted: " +
                         "[ID:${body[Id]}, Name:${body[Name]}, AccountNumber:${body[AccountNumber]}, NumberOfEmployees:${body[NumberOfEmployees]}, BillingAddress: ${body[BillingAddress]}]")
                 .when(header("CamelSalesforceEventType").isEqualTo("deleted"))
-                .log("Demo 12982 A Salesforce Account was deleted: [ID:${body[Id]}]");
+                .log("Demo 12982 A Salesforce Account was deleted: [ID:${body[Id]}]")
+                
+                // notify the exception details
+                .to("direct:slack-notification");;
 
                
                 // from("direct:netsuite-create-customer-route").id("direct-customer-master")
